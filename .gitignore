@@ -130,3 +130,7 @@ dmypy.json
 
 # OSX stuff
 .DS_Store
+
+# Dataset files
+data
+masks/
