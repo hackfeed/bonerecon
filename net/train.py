@@ -5,7 +5,7 @@ import cv2
 import numpy as np
 from tensorflow.keras.models import save_model
 
-from dataset import download_dataset, prepare_dataset
+from dataset import download_dataset, prepare_dataset, prepare_masks
 from imageprep import pre_images
 from maskprep import pre_masks
 from model import UNet
@@ -14,10 +14,12 @@ from model import UNet
 def main():
     if not os.path.exists('data/dataset.zip'):
         download_dataset('data')
-        prepare_dataset('data/dataset.zip', 'masks/masks.zip')
 
-    X = pre_images((512, 512), 'data')
-    Y = pre_masks('masks')
+    prepare_dataset('data/dataset.zip')
+    prepare_masks('masks/masks.zip')
+
+    X = pre_images((512, 512), 'data/Images')
+    Y = pre_masks('masks/masks')
 
     X = np.float32(X/255)
     Y = np.float32(Y/255)
