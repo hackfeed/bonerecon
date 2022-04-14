@@ -4,7 +4,7 @@ from tensorflow.keras.layers import (BatchNormalization, Conv2D,
 from tensorflow.keras.models import Model
 
 
-def UNET(input_shape=(512, 512, 1), last_activation='sigmoid'):
+def UNet(input_shape=(512, 512, 1), last_activation='sigmoid'):
     inputs = Input(shape=input_shape)
 
     conv1 = Conv2D(32, (3, 3), activation='relu', padding='same',
@@ -85,6 +85,6 @@ def UNET(input_shape=(512, 512, 1), last_activation='sigmoid'):
 
     outputs = Conv2D(1, (1, 1), activation=last_activation, padding='same',
                      kernel_initializer='he_normal')(conv22)
-    model2 = Model(inputs=inputs, outputs=outputs)
+    model = Model(inputs=inputs, outputs=outputs)
 
-    return model2
+    return model
