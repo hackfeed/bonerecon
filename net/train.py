@@ -15,11 +15,12 @@ def main():
     if not os.path.exists('data/dataset.zip'):
         download_dataset('data')
 
-    prepare_dataset('data/dataset.zip')
-    prepare_masks('masks/masks.zip')
+    prepare_dataset('data/dataset.zip', 'data')
+    prepare_masks('masks/teeth.zip', 'masks/teeth')
+    prepare_masks('masks/mandibles.zip', 'masks/mandibles')
 
     X = pre_images((512, 512), 'data/Images')
-    Y = pre_masks('masks/masks')
+    Y = pre_masks('masks/teeth')
 
     X = np.float32(X/255)
     Y = np.float32(Y/255)

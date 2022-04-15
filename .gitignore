@@ -133,6 +133,6 @@ dmypy.json
 
 # Dataset files
 data
-net/masks/masks
+net/masks/*/
 trained
 predicted

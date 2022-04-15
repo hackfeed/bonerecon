@@ -17,17 +17,18 @@ def download_dataset(path):
     print(f'Downloaded to {path}/dataset.zip')
 
 
-def prepare_dataset(path='data/dataset.zip'):
+def prepare_dataset(path='data/dataset.zip', extract_to='data'):
     print(f'Extracting {path}...')
-    extract_to = path.split('/')[0]
+
+    if not os.path.exists(extract_to):
+        os.mkdir(extract_to)
+
     ZipFile(path).extractall(extract_to)
     print(f'Extracted to {extract_to}')
 
 
-def prepare_masks(path='masks/masks.zip'):
+def prepare_masks(path='masks/masks.zip', extract_to='data'):
     print(f'Extracting {path}...')
-    extract_to = path.split('/')[0]
-    extract_to = f'{extract_to}/{extract_to}'
 
     if not os.path.exists(extract_to):
         os.mkdir(extract_to)
