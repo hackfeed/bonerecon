@@ -1,3 +1,4 @@
+import argparse
 import os
 
 import albumentations as A
@@ -11,22 +12,25 @@ from maskprep import pre_masks
 from model import UNet
 
 
-def main():
+def main(path, trainTeeth):
     if not os.path.exists('data/dataset.zip'):
         download_dataset('data')
 
     prepare_dataset('data/dataset.zip', 'data')
-    prepare_masks('masks/teeth.zip', 'masks/teeth')
-    prepare_masks('masks/mandibles.zip', 'masks/mandibles')
 
-    X = pre_images((512, 512), 'data/Images')
-    Y = pre_masks('masks/teeth')
+    if trainTeeth:
+        print('Training teeth segmentation')
+        prepare_masks('masks/teeth.zip', 'masks/teeth')
+        y_train = pre_masks('masks/teeth')
+    else:
+        print('Training mandibles segmentation')
+        prepare_masks('masks/mandibles.zip', 'masks/mandibles')
+        y_train = pre_masks('masks/mandibles')
 
-    X = np.float32(X/255)
-    Y = np.float32(Y/255)
+    x_train = pre_images((512, 512), 'data/Images')
 
-    x_train = X
-    y_train = Y
+    x_train = np.float32(x_train/255)
+    y_train = np.float32(y_train/255)
 
     aug = A.Compose([
         A.OneOf([A.RandomCrop(width=512, height=512),
@@ -49,31 +53,38 @@ def main():
 
     count = 0
     while(count < 4):
-        x_aug2 = np.copy(x_train1)
-        y_aug2 = np.copy(y_train1)
+        x_aug = np.copy(x_train1)
+        y_aug = np.copy(y_train1)
 
         for i in range(len(x_train1)):
             augmented = aug(image=x_train1[i, :, :, :], mask=y_train1[i, :, :, :])
-            x_aug2[i, :, :, :] = augmented['image']
-            y_aug2[i, :, :, :] = augmented['mask']
-        x_train = np.concatenate((x_train, x_aug2))
-        y_train = np.concatenate((y_train, y_aug2))
+            x_aug[i, :, :, :] = augmented['image']
+            y_aug[i, :, :, :] = augmented['mask']
+        x_train = np.concatenate((x_train, x_aug))
+        y_train = np.concatenate((y_train, y_aug))
 
         if count == 9:
             break
 
         count += 1
 
-    mem_to_free = [x_aug2, X, Y, y_aug2, y_train1, x_train1, augmented]
+    mem_to_free = [x_aug, x_train, y_train, y_aug, y_train1, x_train1, augmented]
     for mem in mem_to_free:
         del mem
 
     model = UNet(input_shape=(512, 512, 1), last_activation='sigmoid')
     model.compile(optimizer='adam', loss='binary_crossentropy', metrics=['accuracy'])
-    model.fit(x_train, y_train, batch_size=16, epochs=100, verbose=1)
+    model.fit(x_train, y_train, batch_size=8, epochs=200, verbose=1)
 
-    save_model(model, 'trained/bonerecon.h5')
+    save_model(model, path)
 
 
 if __name__ == '__main__':
-    main()
+    parser = argparse.ArgumentParser()
+    teeth = True
+    parser.add_argument('-m', action='store_const', default=teeth, const=not teeth)
+    parser.add_argument('-o', '--output', default='trained/bonerecon.h5')
+
+    args = parser.parse_args()
+
+    main(args.output, args.m)
