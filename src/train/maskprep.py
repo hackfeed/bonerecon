@@ -1,10 +1,9 @@
 import os
 
 import numpy as np
+from image import convert_one_channel
 from natsort import natsorted
 from PIL import Image
-
-from image import convert_one_channel
 
 
 def pre_masks(path='masks'):

@@ -4,11 +4,10 @@ import os
 import cv2
 import matplotlib.pyplot as plt
 import numpy as np
-from PIL import Image
-from tensorflow.keras.models import load_model
-
 from cca import analyze
 from image import convert_one_channel, convert_rgb
+from PIL import Image
+from tensorflow.keras.models import load_model
 
 
 def main(model, image, output_dir):
