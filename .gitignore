@@ -136,3 +136,12 @@ data
 src/train/masks/*/
 trained
 predicted
+
+# Tex files
+*.aux
+*.synctex.gz
+*.toc
+*.bbl
+*.blg
+*.log
+*.out
