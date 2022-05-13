@@ -1,60 +1,38 @@
-import argparse
-import os
-
-import cv2
-import matplotlib.pyplot as plt
-import numpy as np
-from cca import analyze
-from image import convert_one_channel, convert_rgb
-from PIL import Image
-from tensorflow.keras.models import load_model
+import dearpygui.dearpygui as dpg
 
 
-def main(model, image, output_dir):
-    model = load_model(model)
-    img = Image.open(image)
-    img = np.asarray(img)
+def saveData(dest, src):
+    dest = src
 
-    img_cv = convert_one_channel(img)
-    img_cv = cv2.resize(img_cv, (512, 512), interpolation=cv2.INTER_LANCZOS4)
-    img_cv = np.float32(img_cv/255)
-    img_cv = np.reshape(img_cv, (1, 512, 512, 1))
 
-    predicted = model.predict(img_cv)[0]
-    predicted = cv2.resize(
-        predicted, (img.shape[1], img.shape[0]), interpolation=cv2.INTER_LANCZOS4)
+def main():
+    filepath = ""
 
-    if not os.path.exists(output_dir):
-        os.mkdir(output_dir)
+    dpg.create_context()
+    dpg.create_viewport(title="bonerecon", width=600, height=400, resizable=False)
+    dpg.setup_dearpygui()
 
-    plt.imsave(f'{output_dir}/predicted.png', predicted)
+    with dpg.font_registry():
+        with dpg.font("/Users/kononenko/Library/Fonts/consola.ttf", 12) as default_font:
+            dpg.add_font_range_hint(dpg.mvFontRangeHint_Default)
+            dpg.add_font_range_hint(dpg.mvFontRangeHint_Cyrillic)
 
-    thresh = np.uint8(predicted*255)
-    thresh = cv2.threshold(thresh, thresh=0, maxval=255, type=cv2.THRESH_BINARY+cv2.THRESH_OTSU)[1]
-    kernel = (np.ones((5, 5), dtype=np.float32))
-    thresh = cv2.morphologyEx(thresh, cv2.MORPH_OPEN, kernel, iterations=1)
-    thresh = cv2.morphologyEx(thresh, cv2.MORPH_CLOSE, kernel, iterations=1)
+    with dpg.file_dialog(directory_selector=False, show=False, callback=lambda _, x: saveData(filepath, x['file_path_name']), id="file_dialog_id"):
+        dpg.add_file_extension(".png")
+        dpg.add_file_extension(".jpg")
+        dpg.add_file_extension(".jpeg")
+        dpg.bind_font(default_font)
 
-    cnts = cv2.findContours(thresh, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)[0]
-    output = cv2.drawContours(convert_rgb(img), cnts, -1, (255, 0, 0), 3)
-    plt.imsave(f'{output_dir}/segmented.png', output)
+    with dpg.window(tag="primary"):
+        dpg.add_button(label="Выберите файл", callback=lambda: dpg.show_item("file_dialog_id"))
+        dpg.add_checkbox()
+        dpg.bind_font(default_font)
 
-    img = cv2.imread(image)
-    predicted = cv2.imread(f'{output_dir}/predicted.png')
-    predicted = cv2.resize(
-        predicted, (img.shape[1], img.shape[0]), interpolation=cv2.INTER_LANCZOS4)
-
-    cca, teeth_count = analyze(img, predicted, 3, 2)
-    plt.imsave(f'{output_dir}/segmented_cca.png', cca)
-    print(f'Segmented teeth count is {teeth_count}')
+    dpg.show_viewport()
+    dpg.set_primary_window("primary", True)
+    dpg.start_dearpygui()
+    dpg.destroy_context()
 
 
 if __name__ == '__main__':
-    parser = argparse.ArgumentParser()
-    parser.add_argument('-m', '--model', default='trained/bonerecon.h5')
-    parser.add_argument('-i', '--image', default='data/file.jpeg')
-    parser.add_argument('-o', '--output', default='predicted')
-
-    args = parser.parse_args()
-
-    main(args.model, args.image, args.output)
+    main()
