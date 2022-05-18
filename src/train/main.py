@@ -11,7 +11,7 @@ from model import UNet
 from tensorflow.keras.models import save_model
 
 
-def main(path, trainTeeth):
+def main(model_path, history_path, trainTeeth):
     if not os.path.exists('data/dataset.zip'):
         download_dataset('data')
 
@@ -73,7 +73,11 @@ def main(path, trainTeeth):
 
     model = UNet(input_shape=(512, 512, 1), last_activation='sigmoid')
     model.compile(optimizer='adam', loss='binary_crossentropy', metrics=['accuracy'])
-    model.fit(x_train, y_train, batch_size=8, epochs=200, verbose=1)
+    data = model.fit(x_train, y_train, batch_size=8, epochs=200, verbose=1)
+
+    data_file = open(history_path, 'wb')
+    pickle.dump(data.history, data_file)
+    data_file.close()
 
     save_model(model, path)
 
@@ -83,7 +87,8 @@ if __name__ == '__main__':
     teeth = True
     parser.add_argument('-m', action='store_const', default=teeth, const=not teeth)
     parser.add_argument('-o', '--output', default='trained/bonerecon.h5')
+    parser.add_argument('-d', '--data', default='trained/bonerecon.hist')
 
     args = parser.parse_args()
 
-    main(args.output, args.m)
+    main(args.output, args.data, args.m)
