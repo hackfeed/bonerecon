@@ -80,7 +80,7 @@ def main(model_path, history_path, trainTeeth):
     pickle.dump(data.history, data_file)
     data_file.close()
 
-    save_model(model, path)
+    save_model(model, model_path)
 
 
 if __name__ == '__main__':
