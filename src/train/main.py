@@ -86,9 +86,10 @@ def main(model_path, history_path, trainTeeth):
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     teeth = True
-    parser.add_argument('-m', action='store_const', default=teeth, const=not teeth)
-    parser.add_argument('-o', '--output', default='trained/bonerecon.h5')
-    parser.add_argument('-d', '--data', default='trained/bonerecon.hist')
+    parser.add_argument('-m', action='store_const', default=teeth, const=not teeth,
+                        help='Произвести тренировку челюстной сегментации')
+    parser.add_argument('-o', '--output', default='trained/bonerecon.h5', help='Путь сохранения обученной модели')
+    parser.add_argument('-d', '--data', default='trained/bonerecon.hist', help='Путь сохранения истории обучения')
 
     args = parser.parse_args()
 

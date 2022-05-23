@@ -4,10 +4,10 @@ from imutils import perspective
 from scipy.spatial import distance as dist
 from sklearn import svm
 
-MOLARES_COLOR = [0, 0, 255]
+MOLARES_COLOR = [255, 0, 0]
 PREMOLARES_COLOR = [0, 255, 0]
-CANINOS_COLOR = [255, 0, 0]
-INCISIVOS_COLOR = [255, 255, 0]
+CANINOS_COLOR = [255, 255, 0]
+INCISIVOS_COLOR = [0, 0, 255]
 
 COLORS = {
     0: MOLARES_COLOR,
@@ -35,6 +35,16 @@ def classifier():
         [310.6, 139.2],
         [263.4, 149],
         [230.7, 159.8],
+
+        [338.3, 144.5],
+        [309.5, 137.3],
+        [277.6, 149.5],
+        [365.9, 153.1],
+        [375.7, 147.6],
+        [351.4, 113.6],
+        [256, 133],
+        [283.3, 182.2],
+        [368.4, 153.7],
         # Premolares
         [281.4, 70.6],
         [284.5, 79.7],
@@ -49,6 +59,10 @@ def classifier():
         [384.3, 96],
         [377.1, 83],
         [363.5, 82.1],
+        [433.6, 111],
+        [350.7, 88.4],
+        [388.8, 101.1],
+        [363.9, 91.2],
         # Incisivios
         [327.5, 87.6],
         [360, 104],
@@ -73,6 +87,16 @@ def classifier():
         0,
         0,
         0,
+
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
         # Premolares
         1,
         1,
@@ -83,6 +107,11 @@ def classifier():
         1,
         1,
         # Caninos
+        2,
+        2,
+        2,
+        2,
+
         2,
         2,
         2,

@@ -10,7 +10,7 @@ from PIL import Image
 from tensorflow.keras.models import load_model
 
 
-def main(model, image, output_dir):
+def main(model, image, output_dir, use_svm):
     model = load_model(model)
     img = Image.open(image)
     img = np.asarray(img)
@@ -41,20 +41,25 @@ def main(model, image, output_dir):
 
     img = cv2.imread(image)
     predicted = cv2.imread(f'{output_dir}/predicted.png')
-    predicted = cv2.resize(
-        predicted, (img.shape[1], img.shape[0]), interpolation=cv2.INTER_LANCZOS4)
+    predicted = cv2.resize(predicted, (img.shape[1], img.shape[0]), interpolation=cv2.INTER_LANCZOS4)
 
-    cca, teeth_count = analyze(img, predicted, 3, 2, True)
+    cca, teeth_count = analyze(img, predicted, 3, 2)
     plt.imsave(f'{output_dir}/segmented_cca.png', cca)
+    if use_svm:
+        svm, _ = analyze(img, predicted, 3, 2, use_svm)
+        plt.imsave(f'{output_dir}/segmented_svm.png', svm)
     print(f'Segmented teeth count is {teeth_count}')
 
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
-    parser.add_argument('-m', '--model', default='trained/bonerecon.h5')
-    parser.add_argument('-i', '--image', default='data/file.jpeg')
-    parser.add_argument('-o', '--output', default='predicted')
+    parser.add_argument('-m', '--model', default='trained/bonerecon.h5', help='Путь к файлу с обученной моделью')
+    parser.add_argument('-i', '--image', default='data/file.jpeg', help='Пусть к файлу снимка')
+    parser.add_argument('-o', '--output', default='predicted', help='Директория для сохранения результатов')
+    use_svm = False
+    parser.add_argument('-c', action='store_const', default=use_svm, const=not use_svm,
+                        help='Произвести сегментацию по экземплярам')
 
     args = parser.parse_args()
 
-    main(args.model, args.image, args.output)
+    main(args.model, args.image, args.output, args.c)
