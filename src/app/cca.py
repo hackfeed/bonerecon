@@ -2,13 +2,110 @@ import cv2
 import numpy as np
 from imutils import perspective
 from scipy.spatial import distance as dist
+from sklearn import svm
+
+MOLARES_COLOR = [0, 0, 255]
+PREMOLARES_COLOR = [0, 255, 0]
+CANINOS_COLOR = [255, 0, 0]
+INCISIVOS_COLOR = [255, 255, 0]
+
+COLORS = {
+    0: MOLARES_COLOR,
+    1: PREMOLARES_COLOR,
+    2: CANINOS_COLOR,
+    3: INCISIVOS_COLOR
+}
 
 
 def midpoint(ptA, ptB):
     return ((ptA[0] + ptB[0]) * 0.5, (ptA[1] + ptB[1]) * 0.5)
 
 
-def analyze(orig_image, predict_image, erode_iteration, open_iteration):
+def classifier():
+    X = [
+        # Molares
+        [286.9, 153.1],
+        [289.6, 142.5],
+        [236.8, 134.7],
+        [272.4, 153.2],
+        [287.9, 150.1],
+        [290.9, 133],
+        [274.1, 136.5],
+        [195.5, 129.6],
+        [310.6, 139.2],
+        [263.4, 149],
+        [230.7, 159.8],
+        # Premolares
+        [281.4, 70.6],
+        [284.5, 79.7],
+        [285.3, 89.1],
+        [289.5, 83.4],
+        [273.5, 81.2],
+        [289.6, 77.4],
+        [290.3, 75.8],
+        [282, 75],
+        # Caninos
+        [406, 99],
+        [384.3, 96],
+        [377.1, 83],
+        [363.5, 82.1],
+        # Incisivios
+        [327.5, 87.6],
+        [360, 104],
+        [327.2, 103],
+        [331.6, 86.5],
+        [314, 60],
+        [288, 60],
+        [280, 64],
+        [314.3, 62.1],
+    ]
+
+    Y = [
+        # Molares
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        # Premolares
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        # Caninos
+        2,
+        2,
+        2,
+        2,
+        # Incisivios
+        3,
+        3,
+        3,
+        3,
+        3,
+        3,
+        3,
+        3,
+    ]
+
+    return svm.SVC().fit(X, Y)
+
+
+def analyze(orig_image, predict_image, erode_iteration, open_iteration, use_svm=False):
+    clf = None
+    if use_svm:
+        clf = classifier()
+
     kernel = (np.ones((5, 5), dtype=np.float32))
     kernel_sharpening = np.array([[-1, -1, -1],
                                   [-1, 9, -1],
@@ -45,8 +142,14 @@ def analyze(orig_image, predict_image, erode_iteration, open_iteration):
         box = np.array(box, dtype="int")
         box = perspective.order_points(box)
 
-        intcolor = (list(np.random.choice(range(150), size=3)))
-        color = [int(intcolor[0]), int(intcolor[1]), int(intcolor[2])]
+        if use_svm:
+            tooth = rect[1]
+            if tooth[1] > tooth[0]:
+                tooth = [tooth[1], tooth[0]]
+            color = COLORS[clf.predict([tooth])[0]]
+        else:
+            intcolor = (list(np.random.choice(range(150), size=3)))
+            color = [int(intcolor[0]), int(intcolor[1]), int(intcolor[2])]
 
         cv2.drawContours(oimage, [box.astype("int")], 0, color, 2)
         (tl, tr, br, bl) = box

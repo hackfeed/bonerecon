@@ -44,7 +44,7 @@ def main(model, image, output_dir):
     predicted = cv2.resize(
         predicted, (img.shape[1], img.shape[0]), interpolation=cv2.INTER_LANCZOS4)
 
-    cca, teeth_count = analyze(img, predicted, 3, 2)
+    cca, teeth_count = analyze(img, predicted, 3, 2, True)
     plt.imsave(f'{output_dir}/segmented_cca.png', cca)
     print(f'Segmented teeth count is {teeth_count}')
 
