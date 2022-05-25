@@ -32,13 +32,21 @@
 
 В листинге \ref{lst:unet} (приложение 1) приведена реализация модели, отвечающей за сегментацию изображения.
 
-На выходе модель предоставляет маску для изображения, по которой происходит дальнейшее выделение. Пример такой маски приведен на рисунке \ref{fig:mask}.
+На выходе модель предоставляет маску для изображения, по которой происходит дальнейшее выделение. Примеры таких масок приведены на рисунках \ref{fig:mask} и \ref{fig:maskmand} для зубов и для нижней челюсти соответственно.
 
 \begin{figure}[H]
 	\centering
 	\includegraphics[width=\textwidth]{img/mask.png}
-	\caption{Результат работы модели}
+	\caption{Результат работы модели (зубной состав)}
 	\label{fig:mask}
+\end{figure}
+
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=\textwidth]{img/maskmand.png}
+	\caption{Результат работы модели (нижняя челюсть)}
+	\label{fig:maskmand}
 \end{figure}
 
 \subsubsection{Тренировка модели}
@@ -95,8 +103,15 @@
 \begin{figure}[H]
 	\centering
 	\includegraphics[width=\textwidth]{img/segmented.png}
-	\caption{Результат работы семантической сегментации}
+	\caption{Результат работы семантической сегментации (зубной состав)}
 	\label{fig:segmented}
+\end{figure}
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=\textwidth]{img/segmented_mand.png}
+	\caption{Результат работы семантической сегментации (нижняя челюсть)}
+	\label{fig:segmented_mand}
 \end{figure}
 
 \begin{figure}[H]
