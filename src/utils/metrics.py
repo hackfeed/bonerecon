@@ -24,6 +24,19 @@ def main():
     plt.xlabel('Эпоха')
     plt.savefig('loss.svg', format='svg')
 
+    x = ['100%', '75%', '50%', '25%']
+    y1 = [17.5, 13.18, 11.48, 10.46]
+    y2 = [14.4, 12.68, 11.03, 10.37]
+
+    plt.figure(2)
+    plt.bar(x, y1, color='red')
+    plt.bar(x, y2, color='green')
+    plt.title('Зависимость времени работы приложения от размера снимка')
+    plt.xlabel('Размер снимка, % от исходного')
+    plt.ylabel('Время работы приложения, сек.')
+    plt.legend(['С классификацией', 'Без классификации'])
+    plt.savefig('run.svg', format='svg')
+
 
 if __name__ == '__main__':
     main()
